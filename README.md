@@ -13,5 +13,5 @@ this trait calls needed accessor as if it was declared directly in the child-cla
 
 
 You need just add one of the following tags to the PHPDoc to mark property as 
-accessible to the corresponding methods: @get, @set, @isset. Tag @accessors marks
-property as full-accessible.
+accessible to the corresponding methods: `@get`, `@set`, `@isset`. Tag `@accessors` 
+marks property as full-accessible.
