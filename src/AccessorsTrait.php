@@ -45,7 +45,7 @@ trait AccessorsTrait
                 return null;
             };
             if (($rawType = $getTagByName('var', $parsedDocComment['tags'])) !== null) {
-                if (is_null($rawType['type'])) {
+                if (!is_null($rawType['type'])) {
                     $this->propCache[$propName]['type'] = $rawType['type'];
                 }
             }
