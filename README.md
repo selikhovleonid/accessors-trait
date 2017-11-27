@@ -12,7 +12,7 @@ The minimum required PHP version is PHP 5.4. You will need Composer dependency
 manager to install this tiny tool.
 
 ```
-php composer.phar require selikhovleonid/accessors-trait:dev-master
+php composer.phar require selikhovleonid/accessors-trait
 ```
 
 ## Quick start
