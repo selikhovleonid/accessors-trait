@@ -1,0 +1,26 @@
+{
+    "name": "selikhovleonid/accessors-trait",
+    "description": "Trait for Property Accessors Generation",
+    "keywords": [
+        "property",
+        "accessors",
+        "getter",
+        "setter"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Leonid Selikhov",
+            "email": "selikhovleonid@ya.ru",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "selikhovleonid/phpdoc-parser": "dev-master"
+    },
+    "autoload": {
+        "files": ["src/AccessorsTrait.php"]
+    }
+}
