@@ -9,7 +9,9 @@ namespace nadir2;
  */
 trait AccessorsTrait
 {
-    /** @var type The cache of properties accessibility. */
+    /**
+     * @var array The cache of properties accessibility.
+     */
     private $propCache = [];
 
     /**
@@ -85,9 +87,9 @@ trait AccessorsTrait
     /**
      * This is interceptor method, which catches the calls of undeclared methods of
      * the class. If the name of the invoked method matches the setProperty, getProperty
-     * or isPropertySet pattern and the target class has corresponding public
-     * property, then it calls needed accessor as if it was declared directly in
-     * the child-class. In another case it throws exception.
+     * or isPropertySet pattern and the target class has corresponding property,
+     * then it calls needed accessor as if it was declared directly in the
+     * child-class. In another case it throws exception.
      * @param string $methodName The name of the method.
      * @param mixed[] $args The array of passed args.
      * @return mixed|boolean The result is mixed for the getters and setters, is
