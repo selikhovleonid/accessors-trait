@@ -9,7 +9,64 @@ namespace nadir2;
  */
 trait AccessorsTrait
 {
+    /** @var type The cache of properties accessibility. */
     private $propCache = [];
+
+    /**
+     * The method gets PHPDoc comment block of passed property and parses it.
+     * After that it defines accessibility of the property for each type of methods
+     * and pushes created structure to the cache.
+     * @param string $propName The property name.
+     */
+    private function addPropToCache($propName)
+    {
+        $this->propCache[$propName] = [
+            'accessors' => [
+                'get'   => false,
+                'set'   => false,
+                'isset' => false,
+            ],
+            'type' => null,
+        ];
+        $reflection           = new \ReflectionClass(get_class($this));
+        if ($reflection->hasProperty($propName)) {
+            $docComment       = $reflection->getProperty($propName)
+                ->getDocComment();
+            $parsedDocComment = phpDocParser\parseDocComment($docComment);
+            // Lambda
+            $getTagByName = function ($name, array $tags) {
+                foreach ($tags as $tag) {
+                    if ($tag['name'] === $name) {
+                        return $tag;
+                    }
+                }
+                return null;
+            };
+            if (($rawType = $getTagByName('var', $parsedDocComment['tags'])) !== null) {
+                if (is_null($rawType['type'])) {
+                    $this->propCache[$propName]['type'] = $rawType['type'];
+                }
+            }
+            if (!is_null($getTagByName('accessors', $parsedDocComment['tags']))) {
+                array_walk(
+                    $this->propCache[$propName]['accessors'],
+                    function (&$value) {
+                        $value = true;
+                    }
+                );
+            } else {
+                if (!is_null($getTagByName('get', $parsedDocComment['tags']))) {
+                    $this->propCache[$propName]['accessors']['get'] = true;
+                }
+                if (!is_null($getTagByName('set', $parsedDocComment['tags']))) {
+                    $this->propCache[$propName]['accessors']['set'] = true;
+                }
+                if (!is_null($getTagByName('isset', $parsedDocComment['tags']))) {
+                    $this->propCache[$propName]['accessors']['isset'] = true;
+                }
+            }
+        }
+    }
 
     /**
      * It's a reflection method, which checks a availability and accessibility
@@ -20,55 +77,7 @@ trait AccessorsTrait
     private function isPropAccessible($accessorName, $propName)
     {
         if (!isset($this->propCache[$propName])) {
-            $this->propCache[$propName] = [
-                'accessors' => [
-                    'get'   => false,
-                    'set'   => false,
-                    'isset' => false,
-                ],
-                'type' => null,
-            ];
-            $reflection           = new \ReflectionClass(get_class($this));
-            if ($reflection->hasProperty($propName)) {
-                $docComment       = $reflection->getProperty($propName)
-                    ->getDocComment();
-                $parsedDocComment = phpDocParser\parseDocComment($docComment);
-                // Lambda
-                $getTagByName = function ($name, array $tags) {
-                    foreach ($tags as $tag) {
-                        if ($tag['name'] === $name) {
-                            return $tag;
-                        }
-                    }
-                    return null;
-                };
-                if (($rawType = $getTagByName('var', $parsedDocComment['tags'])) !== null) {
-                    if (is_null($rawType['type'])) {
-                        if (interface_exists($rawType['type']) || class_exists($rawType['type']) || trait_exists($rawType['type'])) {
-                            $this->propCache[$propName]['type'] = $rawType['type'];
-                        }
-                    }
-                }
-                if (!is_null($getTagByName('accessors', $parsedDocComment['tags']))) {
-                    array_walk(
-                        $this->propCache[$propName]['accessors'],
-                        function (&$value) {
-                            $value = true;
-                        }
-                    );
-                } else {
-                    if (!is_null($getTagByName('get', $parsedDocComment['tags']))) {
-                        $this->propCache[$propName]['accessors']['get'] = true;
-                    }
-                    if (!is_null($getTagByName('set', $parsedDocComment['tags']))) {
-                        $this->propCache[$propName]['accessors']['set'] = true;
-                    }
-                    if (!is_null($getTagByName('isset', $parsedDocComment['tags']))) {
-                        $this->propCache[$propName]['accessors']['isset'] = true;
-                    }
-                }
-            }
-            unset($reflection);
+            $this->addPropToCache($propName);
         }
         return $this->propCache[$propName]['accessors'][$accessorName];
     }
