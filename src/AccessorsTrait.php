@@ -1,6 +1,6 @@
 <?php
 
-namespace nadir2;
+namespace nadir2\tools;
 
 /**
  * This trait provides auto generation of accessors and mutators methods (get-,

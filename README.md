@@ -33,7 +33,7 @@ marks property as full-accessible.
  */
 class Foo
 {
-    use \nadir2\AccessorsTrait;
+    use \nadir2\tools\AccessorsTrait;
 
     /**
      * @var string Property description
