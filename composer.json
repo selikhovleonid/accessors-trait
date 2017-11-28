@@ -21,6 +21,8 @@
         "selikhovleonid/phpdoc-parser": "dev-master"
     },
     "autoload": {
-        "files": ["src/AccessorsTrait.php"]
+        "psr-4": {
+            "nadir2\\tools\\": "src/"
+        }
     }
 }
