@@ -94,13 +94,13 @@ trait AccessorsTrait
      * @param mixed[] $args The array of passed args.
      * @return mixed|boolean The result is mixed for the getters and setters, is
      * boolean for isSets.
-     * @throws \Exception
+     * @throws \nadir2\tools\AccessorsException
      */
     public function __call($methodName, array $args)
     {
         // Lambda-function
         $throwException = function ($accessorName, $propName, $className) {
-            throw new \Exception("Undefined or not {$accessorName}-accessible "
+            throw new AccessorsException("Undefined or not {$accessorName}-accessible "
                 ."property {$className}::\${$propName} was called.");
         };
 
@@ -132,7 +132,7 @@ trait AccessorsTrait
             }
         } else {
             $className = get_class($this);
-            throw new \Exception("Call the undefined method {$className}::{$methodName}");
+            throw new AccessorsException("Call the undefined method {$className}::{$methodName}");
         }
     }
 }
