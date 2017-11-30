@@ -129,8 +129,7 @@ trait AccessorsTrait
         if (strlen($methodName) < 4) {
             self::throwUndefMethodException($methodName, get_class($this));
         }
-        $matches = [];
-        if (substr($methodName, 0, 3) === ($accessorName = 'get')) {
+        if (strncmp($methodName, ($accessorName = 'get'), 3) === 0) {
             $propName     = lcfirst(substr($methodName, 3));
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return $this->$propName;
@@ -141,7 +140,8 @@ trait AccessorsTrait
                     get_class($this)
                 );
             }
-        } elseif (substr($methodName, 0, 3) === ($accessorName = 'set')) {
+        }
+        if (strncmp($methodName, ($accessorName = 'set'), 3) === 0) {
             $propName     = lcfirst(substr($methodName, 3));
             if ($this->isPropAccessible($accessorName, $propName)) {
                 $this->$propName = $args[0];
@@ -153,7 +153,9 @@ trait AccessorsTrait
                     get_class($this)
                 );
             }
-        } elseif (preg_match('#^is(\w+)Set$#', $methodName, $matches)) {
+        }
+        $matches = [];
+        if (preg_match('#^is(\w+)Set$#', $methodName, $matches)) {
             $propName     = lcfirst($matches[1]);
             $accessorName = 'isset';
             if ($this->isPropAccessible($accessorName, $propName)) {
@@ -165,8 +167,7 @@ trait AccessorsTrait
                     get_class($this)
                 );
             }
-        } else {
-            self::throwUndefMethodException($methodName, get_class($this));
         }
+        self::throwUndefMethodException($methodName, get_class($this));
     }
 }
