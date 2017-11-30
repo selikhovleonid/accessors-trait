@@ -91,9 +91,11 @@ trait AccessorsTrait
      * @param string $className Current class name.
      * @throws \nadir2\tools\AccessorsException
      */
-    private static function throwPropAccessException($accessorName, $propName,
-        $className)
-    {
+    private static function throwPropAccessException(
+        $accessorName,
+        $propName,
+        $className
+    ) {
         throw new AccessorsException("Undefined or not {$accessorName}-accessible "
             ."property {$className}::\${$propName} was called.");
     }
@@ -133,8 +135,11 @@ trait AccessorsTrait
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return $this->$propName;
             } else {
-                self::throwPropAccessException($accessorName, $propName,
-                    get_class($this));
+                self::throwPropAccessException(
+                    $accessorName,
+                    $propName,
+                    get_class($this)
+                );
             }
         } elseif (substr($methodName, 0, 3) === ($accessorName = 'set')) {
             $propName     = lcfirst(substr($methodName, 3));
@@ -142,8 +147,11 @@ trait AccessorsTrait
                 $this->$propName = $args[0];
                 return $args[0];
             } else {
-                self::throwPropAccessException($accessorName, $propName,
-                    get_class($this));
+                self::throwPropAccessException(
+                    $accessorName,
+                    $propName,
+                    get_class($this)
+                );
             }
         } elseif (preg_match('#^is(\w+)Set$#', $methodName, $matches)) {
             $propName     = lcfirst($matches[1]);
@@ -151,8 +159,11 @@ trait AccessorsTrait
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return !is_null($this->$propName);
             } else {
-                self::throwPropAccessException($accessorName, $propName,
-                    get_class($this));
+                self::throwPropAccessException(
+                    $accessorName,
+                    $propName,
+                    get_class($this)
+                );
             }
         } else {
             self::throwUndefMethodException($methodName, get_class($this));
