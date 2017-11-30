@@ -88,23 +88,26 @@ trait AccessorsTrait
      * It throws access-level exception of a property.
      * @param string $accessorName Accessor type.
      * @param string $propName The property name.
+     * @param string $className Current class name.
      * @throws \nadir2\tools\AccessorsException
      */
-    private static function throwPropAccessException($accessorName, $propName)
+    private static function throwPropAccessException($accessorName, $propName,
+        $className)
     {
         throw new AccessorsException("Undefined or not {$accessorName}-accessible "
-            .'property '.__CLASS__."::\${$propName} was called.");
+            ."property {$className}::\${$propName} was called.");
     }
 
     /**
      * The method throws exception of an undefined method.
      * @param string $methodName The called method name.
+     * @param string $className Current class name.
      * @throws \nadir2\tools\AccessorsException
      */
-    private static function throwUndefMethodException($methodName)
+    private static function throwUndefMethodException($methodName, $className)
     {
-        throw new AccessorsException('Call the undefined method '.__CLASS__
-            ."::{$methodName}");
+        throw new AccessorsException("Call the undefined method {$className}::"
+            .$methodName);
     }
 
     /**
@@ -122,7 +125,7 @@ trait AccessorsTrait
     public function __call($methodName, array $args)
     {
         if (strlen($methodName) < 4) {
-            self::throwUndefMethodException($methodName);
+            self::throwUndefMethodException($methodName, get_class($this));
         }
         $matches = [];
         if (substr($methodName, 0, 3) === ($accessorName = 'get')) {
@@ -130,7 +133,8 @@ trait AccessorsTrait
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return $this->$propName;
             } else {
-                self::throwPropAccessException($accessorName, $propName);
+                self::throwPropAccessException($accessorName, $propName,
+                    get_class($this));
             }
         } elseif (substr($methodName, 0, 3) === ($accessorName = 'set')) {
             $propName     = lcfirst(substr($methodName, 3));
@@ -138,7 +142,8 @@ trait AccessorsTrait
                 $this->$propName = $args[0];
                 return $args[0];
             } else {
-                self::throwPropAccessException($accessorName, $propName);
+                self::throwPropAccessException($accessorName, $propName,
+                    get_class($this));
             }
         } elseif (preg_match('#^is(\w+)Set$#', $methodName, $matches)) {
             $propName     = lcfirst($matches[1]);
@@ -146,10 +151,11 @@ trait AccessorsTrait
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return !is_null($this->$propName);
             } else {
-                self::throwPropAccessException($accessorName, $propName);
+                self::throwPropAccessException($accessorName, $propName,
+                    get_class($this));
             }
         } else {
-            self::throwUndefMethodException($methodName);
+            self::throwUndefMethodException($methodName, get_class($this));
         }
     }
 }
