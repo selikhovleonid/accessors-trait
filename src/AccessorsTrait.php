@@ -85,6 +85,29 @@ trait AccessorsTrait
     }
 
     /**
+     * It throws access-level exception of a property.
+     * @param string $accessorName Accessor type.
+     * @param string $propName The property name.
+     * @throws \nadir2\tools\AccessorsException
+     */
+    private static function throwPropAccessException($accessorName, $propName)
+    {
+        throw new AccessorsException("Undefined or not {$accessorName}-accessible "
+            .'property '.__CLASS__."::\${$propName} was called.");
+    }
+
+    /**
+     * The method throws exception of an undefined method.
+     * @param string $methodName The called method name.
+     * @throws \nadir2\tools\AccessorsException
+     */
+    private static function throwUndefMethodException($methodName)
+    {
+        throw new AccessorsException('Call the undefined method '.__CLASS__
+            ."::{$methodName}");
+    }
+
+    /**
      * This is interceptor method, which catches the calls of undeclared methods of
      * the class. If the name of the invoked method matches the setProperty, getProperty
      * or isPropertySet pattern and the target class has corresponding property,
@@ -98,29 +121,24 @@ trait AccessorsTrait
      */
     public function __call($methodName, array $args)
     {
-        // Lambda-function
-        $throwException = function ($accessorName, $propName, $className) {
-            throw new AccessorsException("Undefined or not {$accessorName}-accessible "
-                ."property {$className}::\${$propName} was called.");
-        };
-
+        if (strlen($methodName) < 4) {
+            self::throwUndefMethodException($methodName);
+        }
         $matches = [];
-        if (preg_match('#^get(\w+)$#', $methodName, $matches)) {
-            $propName     = lcfirst($matches[1]);
-            $accessorName = 'get';
+        if (substr($methodName, 0, 3) === ($accessorName = 'get')) {
+            $propName     = lcfirst(substr($methodName, 3));
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return $this->$propName;
             } else {
-                $throwException($accessorName, $propName, get_class($this));
+                self::throwPropAccessException($accessorName, $propName);
             }
-        } elseif (preg_match('#^set(\w+)$#', $methodName, $matches)) {
-            $propName     = lcfirst($matches[1]);
-            $accessorName = 'set';
+        } elseif (substr($methodName, 0, 3) === ($accessorName = 'set')) {
+            $propName     = lcfirst(substr($methodName, 3));
             if ($this->isPropAccessible($accessorName, $propName)) {
                 $this->$propName = $args[0];
                 return $args[0];
             } else {
-                $throwException($accessorName, $propName, get_class($this));
+                self::throwPropAccessException($accessorName, $propName);
             }
         } elseif (preg_match('#^is(\w+)Set$#', $methodName, $matches)) {
             $propName     = lcfirst($matches[1]);
@@ -128,11 +146,10 @@ trait AccessorsTrait
             if ($this->isPropAccessible($accessorName, $propName)) {
                 return !is_null($this->$propName);
             } else {
-                $throwException($accessorName, $propName, get_class($this));
+                self::throwPropAccessException($accessorName, $propName);
             }
         } else {
-            $className = get_class($this);
-            throw new AccessorsException("Call the undefined method {$className}::{$methodName}");
+            self::throwUndefMethodException($methodName);
         }
     }
 }
